@@ -94,7 +94,7 @@ function Home() {
               <button
                 style={{
                   background: "#FFE560",
-                  color: "#333",
+                  color: "#6F4E37",
                   padding: "15px 20px",
                   borderRadius: "15px",
                   border: "none",
@@ -103,7 +103,7 @@ function Home() {
                   cursor: "pointer",
                 }}
               >
-                View Stats ✨
+                View Stats
               </button>
             </Link>
           </div>
@@ -112,7 +112,7 @@ function Home() {
             style={{
               display: "flex",
               gap: "20px",
-              color: "#777",
+              color: "#6F4E37",
               fontWeight: "bold",
             }}
           >

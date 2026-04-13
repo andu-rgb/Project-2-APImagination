@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import axios from "axios";
 
-const API = "https://study-flow-7pi0.onrender.com";
+const API = "http://localhost:3001/api/habits";
 
 interface Habit {
   _id: string;
@@ -51,6 +51,7 @@ function Dashboard() {
             outline: "none",
             width: "300px",
             fontSize: "16px",
+            color: "#6F4E37",
           }}
         />
         <button
