@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import axios from "axios";
 
-const API = "http://localhost:3001/api/habits";
+const API = "https://study-flow-7pi0.onrender.com";
 
 interface Habit {
   _id: string;
