@@ -51,7 +51,6 @@ function Dashboard() {
             outline: "none",
             width: "300px",
             fontSize: "16px",
-            color: "#6F4E37",
           }}
         />
         <button
