@@ -22,30 +22,49 @@ const habitSchema = new mongoose.Schema({
 
 const Habit = mongoose.model("Habit", habitSchema);
 
-// Routes
 app.get("/api/habits", async (req, res) => {
-  const habits = await Habit.find();
-  res.json(habits);
+  try {
+    const habits = await Habit.find();
+    res.json(habits);
+  } catch (err) {
+    console.log("GET error:", err.message);
+    res.status(500).json({ error: err.message });
+  }
 });
 
 app.post("/api/habits", async (req, res) => {
-  const habit = new Habit({ name: req.body.name });
-  await habit.save();
-  res.json(habit);
+  try {
+    const habit = new Habit({ name: req.body.name });
+    await habit.save();
+    res.json(habit);
+  } catch (err) {
+    console.log("POST error:", err.message);
+    res.status(500).json({ error: err.message });
+  }
 });
 
 app.put("/api/habits/:id", async (req, res) => {
-  const habit = await Habit.findByIdAndUpdate(
-    req.params.id,
-    { completed: req.body.completed },
-    { new: true }
-  );
-  res.json(habit);
+  try {
+    const habit = await Habit.findByIdAndUpdate(
+      req.params.id,
+      { completed: req.body.completed },
+      { new: true }
+    );
+    res.json(habit);
+  } catch (err) {
+    console.log("PUT error:", err.message);
+    res.status(500).json({ error: err.message });
+  }
 });
 
 app.delete("/api/habits/:id", async (req, res) => {
-  await Habit.findByIdAndDelete(req.params.id);
-  res.json({ message: "Deleted" });
+  try {
+    await Habit.findByIdAndDelete(req.params.id);
+    res.json({ message: "Deleted" });
+  } catch (err) {
+    console.log("DELETE error:", err.message);
+    res.status(500).json({ error: err.message });
+  }
 });
 
 app.listen(process.env.PORT, () => console.log(`Server running on port ${process.env.PORT}`));
