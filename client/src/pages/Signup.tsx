@@ -1,30 +1,31 @@
 import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
+import axios from "axios";
+
+const API = "http://localhost:3001";
 
 function Signup() {
   const [username, setUsername] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [error, setError] = useState("");
   const navigate = useNavigate();
 
-  function handleSignup(e: React.FormEvent) {
+  async function handleSignup(e: React.FormEvent) {
     e.preventDefault();
-
-    if (
-      username.trim() === "" ||
-      email.trim() === "" ||
-      password.trim() === ""
-    ) {
-      alert("Please fill in all fields 💖");
+    if (username.trim() === "" || email.trim() === "" || password.trim() === "") {
+      alert("Please fill in all fields 💝");
       return;
     }
-
-    // fake signup for now
-    localStorage.setItem("loggedIn", "true");
-    localStorage.setItem("username", username);
-    localStorage.setItem("userEmail", email);
-
-    navigate("/dashboard");
+    try {
+      const res = await axios.post(`${API}/api/signup`, { username, email, password });
+      localStorage.setItem("token", res.data.token);
+      localStorage.setItem("username", res.data.username);
+      localStorage.setItem("loggedIn", "true");
+      navigate("/dashboard");
+    } catch (err: any) {
+      setError(err.response?.data?.error || "Signup failed");
+    }
   }
 
   return (
@@ -57,14 +58,11 @@ function Signup() {
           Join StudyFlow ✨
         </h1>
 
-        <p
-          style={{
-            color: "#777",
-            marginBottom: "28px"
-          }}
-        >
-          Create your account and stay productive 💅
+        <p style={{ color: "#777", marginBottom: "28px" }}>
+          Create your account and stay productive 🚀
         </p>
+
+        {error && <p style={{ color: "red", marginBottom: "10px" }}>{error}</p>}
 
         <form onSubmit={handleSignup}>
           <input
@@ -74,7 +72,6 @@ function Signup() {
             onChange={(e) => setUsername(e.target.value)}
             style={inputStyle}
           />
-
           <input
             type="email"
             placeholder="Email"
@@ -82,7 +79,6 @@ function Signup() {
             onChange={(e) => setEmail(e.target.value)}
             style={inputStyle}
           />
-
           <input
             type="password"
             placeholder="Password"
@@ -92,24 +88,15 @@ function Signup() {
           />
 
           <button type="submit" style={buttonStyle}>
-            Create Account 💖
+            Create Account 
           </button>
         </form>
 
-        <p
-          style={{
-            marginTop: "18px",
-            color: "#666"
-          }}
-        >
+        <p style={{ marginTop: "18px", color: "#666", fontSize: "14px" }}>
           Already have an account?{" "}
           <Link
             to="/login"
-            style={{
-              color: "#f48fb1",
-              fontWeight: "bold",
-              textDecoration: "none"
-            }}
+            style={{ color: "#f48fb1", fontWeight: "bold", textDecoration: "none" }}
           >
             Log In 🎀
           </Link>
@@ -124,8 +111,8 @@ const inputStyle = {
   padding: "14px",
   marginBottom: "14px",
   borderRadius: "14px",
-  border: "2px solid #ffe0ea",
-  fontSize: "16px"
+  border: "2px solid #ffe8ea",
+  fontSize: "16px",
 };
 
 const buttonStyle = {
@@ -137,7 +124,7 @@ const buttonStyle = {
   borderRadius: "16px",
   fontWeight: "bold",
   fontSize: "17px",
-  cursor: "pointer"
+  cursor: "pointer",
 };
 
 export default Signup;

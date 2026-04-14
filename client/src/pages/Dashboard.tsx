@@ -13,30 +13,33 @@ function Dashboard() {
   const [habits, setHabits] = useState<Habit[]>([]);
   const [newHabit, setNewHabit] = useState("");
 
+  const token = localStorage.getItem("token");
+  const headers = { Authorization: `Bearer ${token}` };
+
   useEffect(() => {
-    axios.get(API).then((res) => setHabits(res.data));
+    axios.get(API, { headers }).then((res) => setHabits(res.data));
   }, []);
 
   async function addHabit() {
     if (newHabit.trim() === "") return;
-    const res = await axios.post(API, { name: newHabit });
+    const res = await axios.post(API, { name: newHabit }, { headers });
     setHabits([...habits, res.data]);
     setNewHabit("");
   }
 
   async function toggleHabit(id: string, completed: boolean) {
-    const res = await axios.put(`${API}/${id}`, { completed: !completed });
+    const res = await axios.put(`${API}/${id}`, { completed: !completed }, { headers });
     setHabits(habits.map((h) => (h._id === id ? res.data : h)));
   }
 
   async function deleteHabit(id: string) {
-    await axios.delete(`${API}/${id}`);
+    await axios.delete(`${API}/${id}`, { headers });
     setHabits(habits.filter((h) => h._id !== id));
   }
 
   return (
     <div className="page">
-      <h1>❀˖ ° My Study Tasks</h1>
+      <h1>🌸 ° My Study Tasks</h1>
 
       <div style={{ display: "flex", gap: "10px", marginBottom: "20px" }}>
         <input
@@ -66,13 +69,13 @@ function Dashboard() {
             fontSize: "16px",
           }}
         >
-          Add Task ✨
+          Add Task 
         </button>
       </div>
 
       {habits.length === 0 ? (
         <div className="card" style={{ textAlign: "center", padding: "40px" }}>
-          <p style={{ fontSize: "20px" }}><strong>No study tasks yet 📖</strong></p>
+          <p style={{ fontSize: "20px" }}><strong>No study tasks yet</strong></p>
           <p style={{ color: "#9ca3af" }}>Add your first task above!</p>
         </div>
       ) : (
@@ -95,7 +98,7 @@ function Dashboard() {
                 fontSize: "16px",
               }}
             >
-              {habit.completed ? "✔ " : "‣ "}{habit.name}
+              {habit.completed ? "✔ " : "✦ "}{habit.name}
             </span>
             <div style={{ display: "flex", gap: "10px" }}>
               <button

@@ -2,6 +2,7 @@ require("dotenv").config();
 const express = require("express");
 const cors = require("cors");
 const mongoose = require("mongoose");
+const bcrypt = require("bcrypt");
 
 const app = express();
 app.use(cors());
@@ -50,7 +51,8 @@ app.post("/api/signup", async (req, res) => {
     const { username, email, password } = req.body;
     const existing = await User.findOne({ email });
     if (existing) return res.status(400).json({ error: "Email already used" });
-    const user = new User({ username, email, password });
+    const hashedPassword = await bcrypt.hash(password, 10); // ✅ hash it
+    const user = new User({ username, email, password: hashedPassword });
     await user.save();
     const token = jwt.sign({ id: user._id, username: user.username }, SECRET);
     res.json({ token, username: user.username });
@@ -63,8 +65,10 @@ app.post("/api/signup", async (req, res) => {
 app.post("/api/login", async (req, res) => {
   try {
     const { email, password } = req.body;
-    const user = await User.findOne({ email, password });
+    const user = await User.findOne({ email }); // ✅ find by email only
     if (!user) return res.status(400).json({ error: "Invalid credentials" });
+    const match = await bcrypt.compare(password, user.password); // ✅ compare hash
+    if (!match) return res.status(400).json({ error: "Invalid credentials" });
     const token = jwt.sign({ id: user._id, username: user.username }, SECRET);
     res.json({ token, username: user.username });
   } catch (err) {

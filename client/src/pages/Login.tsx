@@ -1,171 +1,96 @@
-import { useState, useRef, useEffect } from "react";
-import { Link } from "react-router-dom";
+import { useState } from "react";
+import { Link, useNavigate } from "react-router-dom";
+import axios from "axios";
 
-function Navbar() {
-  const [open, setOpen] = useState(false);
-  const [loggedIn, setLoggedIn] = useState(
-    localStorage.getItem("loggedIn") === "true"
-  );
+const API = "http://localhost:3001";
 
-  const menuRef = useRef<HTMLDivElement>(null);
+function Login() {
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [error, setError] = useState("");
+  const navigate = useNavigate();
 
-  useEffect(() => {
-    function handleClickOutside(e: MouseEvent) {
-      if (menuRef.current && !menuRef.current.contains(e.target as Node)) {
-        setOpen(false);
-      }
-    }
-
-    document.addEventListener("mousedown", handleClickOutside);
-    return () => document.removeEventListener("mousedown", handleClickOutside);
-  }, []);
-
-  function handleLogin(e: React.FormEvent) {
+  async function handleLogin(e: React.FormEvent) {
     e.preventDefault();
-
-    localStorage.setItem("loggedIn", "true");
-    setLoggedIn(true);
-    setOpen(false);
-  }
-
-  function handleLogout() {
-    localStorage.removeItem("loggedIn");
-    setLoggedIn(false);
-    setOpen(false);
+    try {
+      const res = await axios.post(`${API}/api/login`, { email, password });
+      localStorage.setItem("token", res.data.token);
+      localStorage.setItem("username", res.data.username);
+      localStorage.setItem("loggedIn", "true");
+      navigate("/dashboard");
+    } catch (err: any) {
+      setError(err.response?.data?.error || "Invalid email or password");
+    }
   }
 
   return (
-    <nav
-      style={{
-        background: "#f48fb1",
-        padding: "18px 30px",
-        display: "flex",
-        justifyContent: "space-between",
-        alignItems: "center",
-        borderBottomLeftRadius: "22px",
-        borderBottomRightRadius: "22px",
-        boxShadow: "0 8px 18px rgba(0,0,0,0.08)"
-      }}
-    >
-      {/* LEFT SIDE */}
-      <div style={{ display: "flex", gap: "28px" }}>
-        <Link to="/" style={linkStyle}>Home</Link>
-        <Link to="/dashboard" style={linkStyle}>Dashboard</Link>
-        <Link to="/stats" style={linkStyle}>Stats</Link>
-      </div>
+    <div style={{
+      display: "flex",
+      justifyContent: "center",
+      alignItems: "center",
+      minHeight: "85vh"
+    }}>
+      <div style={{
+        background: "white",
+        width: "430px",
+        padding: "45px",
+        borderRadius: "30px",
+        boxShadow: "0 14px 30px rgba(0,0,0,0.08)",
+        textAlign: "center"
+      }}>
+        <h1 style={{ color: "#f48fb1", fontSize: "40px", marginBottom: "10px" }}>
+          Welcome Back 🎀
+        </h1>
 
-      {/* RIGHT SIDE */}
-      <div style={{ position: "relative" }} ref={menuRef}>
-        <button
-          onClick={() => setOpen(!open)}
-          style={{
-            background: "white",
+        <p style={{ color: "#777", marginBottom: "28px" }}>
+          Ready to crush your goals today? 
+        </p>
+
+        {error && <p style={{ color: "red", marginBottom: "10px" }}>{error}</p>}
+
+        <form onSubmit={handleLogin}>
+          <input
+            type="email"
+            placeholder="Email"
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+            style={inputStyle}
+          />
+          <input
+            type="password"
+            placeholder="Password"
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
+            style={inputStyle}
+          />
+          <button type="submit" style={buttonStyle}>
+            Sign In 
+          </button>
+        </form>
+
+        <p style={{ marginTop: "18px", color: "#666", fontSize: "14px" }}>
+          New here?{" "}
+          <Link to="/signup" style={{
             color: "#f48fb1",
-            border: "none",
-            padding: "10px 18px",
-            borderRadius: "16px",
             fontWeight: "bold",
-            cursor: "pointer",
-            fontSize: "16px"
-          }}
-        >
-          {loggedIn ? "My Account 👤" : "Login ▼"}
-        </button>
-
-        {open && (
-          <div
-            style={{
-              position: "absolute",
-              top: "60px",
-              right: "0",
-              width: "290px",
-              background: "white",
-              padding: "22px",
-              borderRadius: "20px",
-              boxShadow: "0 15px 35px rgba(0,0,0,0.12)",
-              animation: "fadeDown 0.25s ease"
-            }}
-          >
-            {!loggedIn ? (
-              <form onSubmit={handleLogin}>
-                <h3
-                  style={{
-                    marginTop: 0,
-                    color: "#f48fb1",
-                    marginBottom: "16px"
-                  }}
-                >
-                  Welcome Back 🎀
-                </h3>
-
-                <input
-                  placeholder="Email"
-                  style={inputStyle}
-                />
-
-                <input
-                  type="password"
-                  placeholder="Password"
-                  style={inputStyle}
-                />
-
-                <button style={buttonStyle}>
-                  Sign In 💖
-                </button>
-
-                <p
-                  style={{
-                    textAlign: "center",
-                    marginTop: "12px",
-                    color: "#777",
-                    fontSize: "14px"
-                  }}
-                >
-                  New here? Sign up ✨
-                </p>
-              </form>
-            ) : (
-              <div style={{ textAlign: "center" }}>
-                <h3 style={{ color: "#f48fb1" }}>
-                  Hello Bestie 💅
-                </h3>
-
-                <p style={{ color: "#666" }}>
-                  Ready to crush your goals today?
-                </p>
-
-                <button
-                  onClick={handleLogout}
-                  style={{
-                    ...buttonStyle,
-                    marginTop: "10px"
-                  }}
-                >
-                  Logout ✨
-                </button>
-              </div>
-            )}
-          </div>
-        )}
+            textDecoration: "none"
+          }}>
+            Sign up ✨
+          </Link>
+        </p>
       </div>
-    </nav>
+    </div>
   );
 }
 
-const linkStyle = {
-  color: "white",
-  textDecoration: "none",
-  fontWeight: "bold",
-  fontSize: "18px"
-};
-
 const inputStyle = {
   width: "100%",
-  padding: "12px",
-  marginBottom: "12px",
-  borderRadius: "12px",
-  border: "2px solid #ffe0ea",
-  fontSize: "15px"
+  padding: "14px",
+  marginBottom: "14px",
+  borderRadius: "14px",
+  border: "2px solid #ffe8ea",
+  fontSize: "16px",
+  boxSizing: "border-box" as const
 };
 
 const buttonStyle = {
@@ -173,11 +98,11 @@ const buttonStyle = {
   background: "#ff8fb1",
   color: "white",
   border: "none",
-  padding: "12px",
-  borderRadius: "14px",
+  padding: "15px",
+  borderRadius: "16px",
   fontWeight: "bold",
-  cursor: "pointer",
-  fontSize: "16px"
+  fontSize: "17px",
+  cursor: "pointer"
 };
 
-export default Navbar;
+export default Login;
