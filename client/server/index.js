@@ -117,16 +117,15 @@ app.post("/api/habits", async (req, res) => {
   }
 });
 
-app.put("/api/habits/:id", async (req, res) => {
+app.put("/api/habits/:id", auth, async (req, res) => {
   try {
     const habit = await Habit.findByIdAndUpdate(
       req.params.id,
-      { completed: req.body.completed },
+      { $set: req.body }, // this already handles both name and completed ✅
       { new: true }
     );
     res.json(habit);
   } catch (err) {
-    console.log("PUT error:", err.message);
     res.status(500).json({ error: err.message });
   }
 });
